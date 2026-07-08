@@ -1,0 +1,85 @@
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-title mb-0">Usuarios</h5>
+    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#nuevoUsuarioModal">
+      <i class="fas fa-plus me-1"></i>Nuevo Usuario
+    </button>
+  </div>
+  <div class="card-body">
+    <% if (usuarios.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Fecha Registro</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% usuarios.forEach(usuario => { %>
+              <tr>
+                <td><%= usuario.email %></td>
+                <td>
+                  <span class="badge <%= usuario.rol === 'admin' ? 'bg-primary' : 'bg-info' %>">
+                    <%= usuario.rol === 'admin' ? 'Administrador' : 'Odontólogo' %>
+                  </span>
+                </td>
+                <td><%= usuario.createdAt.toLocaleDateString() %></td>
+                <td>
+                  <a href="/admin/usuarios/editar/<%= usuario._id %>" class="btn btn-sm btn-warning me-1">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form action="/admin/usuarios/eliminar/<%= usuario._id %>" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar este usuario?')">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <p class="text-muted">No hay usuarios registrados</p>
+    <% } %>
+  </div>
+</div>
+
+<!-- Modal Nuevo Usuario -->
+<div class="modal fade" id="nuevoUsuarioModal" tabindex="-1" aria-labelledby="nuevoUsuarioModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="nuevoUsuarioModalLabel">Nuevo Usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/admin/usuarios" method="POST">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Contraseña</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+          </div>
+          <div class="mb-3">
+            <label for="rol" class="form-label">Rol</label>
+            <select class="form-select" id="rol" name="rol" required>
+              <option value="admin">Administrador</option>
+              <option value="odontologo">Odontólogo</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

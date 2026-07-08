@@ -1,0 +1,102 @@
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-title mb-0">Citas</h5>
+    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#nuevaCitaModal">
+      <i class="fas fa-plus me-1"></i>Nueva Cita
+    </button>
+  </div>
+  <div class="card-body">
+    <% if (citas.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>Odontólogo</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Motivo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% citas.forEach(cita => { %>
+              <tr>
+                <td><%= cita.paciente.nombre %> <%= cita.paciente.apellido %></td>
+                <td><%= cita.odontologo.email %></td>
+                <td><%= cita.fecha.toLocaleDateString() %></td>
+                <td><%= cita.hora %></td>
+                <td>
+                  <% if (cita.motivo.length > 20) { %>
+                    <%= cita.motivo.substring(0, 20) %>...
+                  <% } else { %>
+                    <%= cita.motivo %>
+                  <% } %>
+                </td>
+                <td>
+                  <form action="/admin/citas/eliminar/<%= cita._id %>" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta cita?')">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <p class="text-muted">No hay citas programadas</p>
+    <% } %>
+  </div>
+</div>
+
+<!-- Modal Nueva Cita -->
+<div class="modal fade" id="nuevaCitaModal" tabindex="-1" aria-labelledby="nuevaCitaModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="nuevaCitaModalLabel">Nueva Cita</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/admin/citas" method="POST">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="paciente" class="form-label">Paciente</label>
+            <select class="form-select" id="paciente" name="paciente" required>
+              <option value="">Seleccionar paciente</option>
+              <% pacientes.forEach(paciente => { %>
+                <option value="<%= paciente._id %>"><%= paciente.nombre %> <%= paciente.apellido %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="odontologo" class="form-label">Odontólogo</label>
+            <select class="form-select" id="odontologo" name="odontologo" required>
+              <option value="">Seleccionar odontólogo</option>
+              <% odontologos.forEach(odontologo => { %>
+                <option value="<%= odontologo._id %>"><%= odontologo.email %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="fecha" class="form-label">Fecha</label>
+            <input type="date" class="form-control" id="fecha" name="fecha" required>
+          </div>
+          <div class="mb-3">
+            <label for="hora" class="form-label">Hora</label>
+            <input type="time" class="form-control" id="hora" name="hora" required>
+          </div>
+          <div class="mb-3">
+            <label for="motivo" class="form-label">Motivo</label>
+            <input type="text" class="form-control" id="motivo" name="motivo" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

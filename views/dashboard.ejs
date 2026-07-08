@@ -1,0 +1,97 @@
+<div class="row">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Resumen</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span>Pacientes</span>
+          <span class="badge bg-primary"><%= totalPacientes %></span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span>Tratamientos</span>
+          <span class="badge bg-primary"><%= totalTratamientos %></span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <span>Pagos</span>
+          <span class="badge bg-primary"><%= totalPagos %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Últimos Pacientes</h5>
+      </div>
+      <div class="card-body">
+        <% if (ultimosPacientes.length > 0) { %>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Teléfono</th>
+                  <th>Email</th>
+                  <th>Fecha Registro</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% ultimosPacientes.forEach(paciente => { %>
+                  <tr>
+                    <td><%= paciente.nombre %> <%= paciente.apellido %></td>
+                    <td><%= paciente.telefono %></td>
+                    <td><%= paciente.email || 'N/A' %></td>
+                    <td><%= paciente.createdAt.toLocaleDateString() %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <p class="text-muted">No hay pacientes registrados</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Últimos Pagos</h5>
+      </div>
+      <div class="card-body">
+        <% if (ultimosPagos.length > 0) { %>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Monto</th>
+                  <th>Método</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% ultimosPagos.forEach(pago => { %>
+                  <tr>
+                    <td><%= pago.paciente.nombre %> <%= pago.paciente.apellido %></td>
+                    <td><%= pago.monto.toFixed(2) %> BOB</td>
+                    <td><%= pago.metodoPago %></td>
+                    <td><%= pago.fecha.toLocaleDateString() %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <p class="text-muted">No hay pagos registrados</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>

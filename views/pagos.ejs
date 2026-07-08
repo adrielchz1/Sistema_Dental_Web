@@ -1,0 +1,131 @@
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-title mb-0">Pagos</h5>
+    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#nuevoPagoModal">
+      <i class="fas fa-plus me-1"></i>Nuevo Pago
+    </button>
+  </div>
+  <div class="card-body">
+    <% if (pagos.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>Tratamiento</th>
+              <th>Monto</th>
+              <th>Método</th>
+              <th>Fecha</th>
+              <th>Concepto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% pagos.forEach(pago => { %>
+              <tr>
+                <td><%= pago.paciente.nombre %> <%= pago.paciente.apellido %></td>
+                <td><%= pago.tratamiento ? pago.tratamiento.nombreTratamiento : 'N/A' %></td>
+                <td><%= pago.monto.toFixed(2) %> BOB</td>
+                <td>
+                  <% if (pago.metodoPago === 'efectivo') { %>
+                    <span class="badge bg-success">Efectivo</span>
+                  <% } else if (pago.metodoPago === 'tarjeta') { %>
+                    <span class="badge bg-primary">Tarjeta</span>
+                  <% } else { %>
+                    <span class="badge bg-info">Transferencia</span>
+                  <% } %>
+                </td>
+                <td><%= pago.fecha.toLocaleDateString() %></td>
+                <td>
+                  <% if (pago.concepto.length > 20) { %>
+                    <%= pago.concepto.substring(0, 20) %>...
+                  <% } else { %>
+                    <%= pago.concepto %>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <p class="text-muted">No hay pagos registrados</p>
+    <% } %>
+  </div>
+</div>
+
+<!-- Modal Nuevo Pago -->
+<div class="modal fade" id="nuevoPagoModal" tabindex="-1" aria-labelledby="nuevoPagoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="nuevoPagoModalLabel">Nuevo Pago</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/admin/pagos" method="POST">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="paciente" class="form-label">Paciente</label>
+            <select class="form-select" id="paciente" name="paciente" required>
+              <option value="">Seleccionar paciente</option>
+              <% pacientes.forEach(paciente => { %>
+                <option value="<%= paciente._id %>"><%= paciente.nombre %> <%= paciente.apellido %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="tratamiento" class="form-label">Tratamiento (opcional)</label>
+            <select class="form-select" id="tratamiento" name="tratamiento">
+              <option value="">Seleccionar tratamiento</option>
+              <% tratamientos.forEach(tratamiento => { %>
+                <option value="<%= tratamiento._id %>" data-costo="<%= tratamiento.costo %>">
+                  <%= tratamiento.nombreTratamiento %> - <%= tratamiento.paciente.nombre %>
+                </option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="monto" class="form-label">Monto (BOB)</label>
+            <input type="number" step="0.01" class="form-control" id="monto" name="monto" required>
+          </div>
+          <div class="mb-3">
+            <label for="metodoPago" class="form-label">Método de Pago</label>
+            <select class="form-select" id="metodoPago" name="metodoPago" required>
+              <option value="efectivo">Efectivo</option>
+              <option value="tarjeta">Tarjeta</option>
+              <option value="transferencia">Transferencia</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="concepto" class="form-label">Concepto</label>
+            <input type="text" class="form-control" id="concepto" name="concepto" required>
+          </div>
+          <div class="mb-3">
+            <label for="observaciones" class="form-label">Observaciones</label>
+            <textarea class="form-control" id="observaciones" name="observaciones" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Script para actualizar el monto según el tratamiento seleccionado
+  document.addEventListener('DOMContentLoaded', function() {
+    const tratamientoSelect = document.getElementById('tratamiento');
+    const montoInput = document.getElementById('monto');
+    
+    if (tratamientoSelect && montoInput) {
+      tratamientoSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.dataset.costo) {
+          montoInput.value = selectedOption.dataset.costo;
+        }
+      });
+    }
+  });
+</script>

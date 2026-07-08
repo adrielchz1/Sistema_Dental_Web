@@ -1,0 +1,165 @@
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-title mb-0">Historial Médico</h5>
+    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#nuevoHistorialModal">
+      <i class="fas fa-plus me-1"></i>Nuevo Registro
+    </button>
+  </div>
+  <div class="card-body">
+    <% if (historiales.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>Odontólogo</th>
+              <th>Fecha</th>
+              <th>Diagnóstico</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% historiales.forEach(historial => { %>
+              <tr>
+                <td><%= historial.paciente.nombre %> <%= historial.paciente.apellido %></td>
+                <td><%= historial.odontologo.email %></td>
+                <td><%= historial.fecha.toLocaleDateString() %></td>
+                <td>
+                  <% if (historial.diagnostico.length > 30) { %>
+                    <%= historial.diagnostico.substring(0, 30) %>...
+                  <% } else { %>
+                    <%= historial.diagnostico %>
+                  <% } %>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-info" data-bs-toggle="modal" 
+                    data-bs-target="#detalleHistorialModal" 
+                    data-paciente="<%= historial.paciente.nombre %> <%= historial.paciente.apellido %>"
+                    data-odontologo="<%= historial.odontologo.email %>"
+                    data-fecha="<%= historial.fecha.toLocaleDateString() %>"
+                    data-diagnostico="<%= historial.diagnostico %>"
+                    data-observaciones="<%= historial.observaciones || 'N/A' %>"
+                    data-tratamiento="<%= historial.tratamientoRealizado || 'N/A' %>">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <p class="text-muted">No hay registros de historial médico</p>
+    <% } %>
+  </div>
+</div>
+
+<!-- Modal Nuevo Historial -->
+<div class="modal fade" id="nuevoHistorialModal" tabindex="-1" aria-labelledby="nuevoHistorialModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="nuevoHistorialModalLabel">Nuevo Registro de Historial</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/admin/historial" method="POST">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="paciente" class="form-label">Paciente</label>
+            <select class="form-select" id="paciente" name="paciente" required>
+              <option value="">Seleccionar paciente</option>
+              <% pacientes.forEach(paciente => { %>
+                <option value="<%= paciente._id %>"><%= paciente.nombre %> <%= paciente.apellido %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="odontologo" class="form-label">Odontólogo</label>
+            <select class="form-select" id="odontologo" name="odontologo" required>
+              <option value="">Seleccionar odontólogo</option>
+              <% odontologos.forEach(odontologo => { %>
+                <option value="<%= odontologo._id %>"><%= odontologo.email %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="diagnostico" class="form-label">Diagnóstico</label>
+            <textarea class="form-control" id="diagnostico" name="diagnostico" rows="3" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="observaciones" class="form-label">Observaciones</label>
+            <textarea class="form-control" id="observaciones" name="observaciones" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="tratamientoRealizado" class="form-label">Tratamiento Realizado</label>
+            <input type="text" class="form-control" id="tratamientoRealizado" name="tratamientoRealizado">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalle Historial -->
+<div class="modal fade" id="detalleHistorialModal" tabindex="-1" aria-labelledby="detalleHistorialModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detalleHistorialModalLabel">Detalle del Historial Médico</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label fw-bold">Paciente:</label>
+          <p id="modal-paciente"></p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Odontólogo:</label>
+          <p id="modal-odontologo"></p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Fecha:</label>
+          <p id="modal-fecha"></p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Diagnóstico:</label>
+          <p id="modal-diagnostico"></p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Observaciones:</label>
+          <p id="modal-observaciones"></p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Tratamiento Realizado:</label>
+          <p id="modal-tratamiento"></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Script para mostrar detalles del historial en el modal
+  document.addEventListener('DOMContentLoaded', function() {
+    const detalleHistorialModal = document.getElementById('detalleHistorialModal');
+    if (detalleHistorialModal) {
+      detalleHistorialModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        
+        document.getElementById('modal-paciente').textContent = button.getAttribute('data-paciente');
+        document.getElementById('modal-odontologo').textContent = button.getAttribute('data-odontologo');
+        document.getElementById('modal-fecha').textContent = button.getAttribute('data-fecha');
+        document.getElementById('modal-diagnostico').textContent = button.getAttribute('data-diagnostico');
+        document.getElementById('modal-observaciones').textContent = button.getAttribute('data-observaciones');
+        document.getElementById('modal-tratamiento').textContent = button.getAttribute('data-tratamiento');
+      });
+    }
+  });
+</script>

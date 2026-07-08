@@ -1,0 +1,139 @@
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-title mb-0">Tratamientos</h5>
+    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#nuevoTratamientoModal">
+      <i class="fas fa-plus me-1"></i>Nuevo Tratamiento
+    </button>
+  </div>
+  <div class="card-body">
+    <% if (tratamientos.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>Odontólogo</th>
+              <th>Tratamiento</th>
+              <th>Costo</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% tratamientos.forEach(tratamiento => { %>
+              <tr>
+                <td><%= tratamiento.paciente.nombre %> <%= tratamiento.paciente.apellido %></td>
+                <td><%= tratamiento.odontologo.email %></td>
+                <td><%= tratamiento.nombreTratamiento %></td>
+                <td><%= tratamiento.costo.toFixed(2) %> BOB</td>
+                <td>
+                  <% if (tratamiento.estado === 'pendiente') { %>
+                    <span class="badge bg-warning">Pendiente</span>
+                  <% } else if (tratamiento.estado === 'en_proceso') { %>
+                    <span class="badge bg-info">En Proceso</span>
+                  <% } else { %>
+                    <span class="badge bg-success">Finalizado</span>
+                  <% } %>
+                </td>
+                <td>
+                  <a href="/admin/tratamientos/editar/<%= tratamiento._id %>" class="btn btn-sm btn-warning me-1">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form action="/admin/tratamientos/eliminar/<%= tratamiento._id %>" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar este tratamiento?')">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <p class="text-muted">No hay tratamientos registrados</p>
+    <% } %>
+  </div>
+</div>
+
+<!-- Modal Nuevo Tratamiento -->
+<div class="modal fade" id="nuevoTratamientoModal" tabindex="-1" aria-labelledby="nuevoTratamientoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="nuevoTratamientoModalLabel">Nuevo Tratamiento</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/admin/tratamientos" method="POST">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="paciente" class="form-label">Paciente</label>
+            <select class="form-select" id="paciente" name="paciente" required>
+              <option value="">Seleccionar paciente</option>
+              <% pacientes.forEach(paciente => { %>
+                <option value="<%= paciente._id %>"><%= paciente.nombre %> <%= paciente.apellido %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="odontologo" class="form-label">Odontólogo</label>
+            <select class="form-select" id="odontologo" name="odontologo" required>
+              <option value="">Seleccionar odontólogo</option>
+              <% odontologos.forEach(odontologo => { %>
+                <option value="<%= odontologo._id %>"><%= odontologo.email %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="nombreTratamiento" class="form-label">Tratamiento</label>
+            <select class="form-select" id="nombreTratamiento" name="nombreTratamiento" required>
+              <option value="">Seleccionar tratamiento</option>
+              <% Object.keys(precios).forEach(tratamiento => { %>
+                <option value="<%= tratamiento %>" data-precio="<%= precios[tratamiento] %>">
+                  <%= tratamiento %> - <%= precios[tratamiento].toFixed(2) %> BOB
+                </option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="costo" class="form-label">Costo (BOB)</label>
+            <input type="number" step="0.01" class="form-control" id="costo" name="costo" required>
+          </div>
+          <div class="mb-3">
+            <label for="estado" class="form-label">Estado</label>
+            <select class="form-select" id="estado" name="estado" required>
+              <option value="pendiente">Pendiente</option>
+              <option value="en_proceso">En Proceso</option>
+              <option value="finalizado">Finalizado</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Script para actualizar el costo según el tratamiento seleccionado
+  document.addEventListener('DOMContentLoaded', function() {
+    const tratamientoSelect = document.getElementById('nombreTratamiento');
+    const costoInput = document.getElementById('costo');
+    
+    if (tratamientoSelect && costoInput) {
+      tratamientoSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.dataset.precio) {
+          costoInput.value = selectedOption.dataset.precio;
+        }
+      });
+    }
+  });
+</script>
